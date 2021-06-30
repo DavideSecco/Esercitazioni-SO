@@ -98,8 +98,7 @@
 								close(piped[j][1]);
 								/* Ridirezione dello standard input (si poteva anche non fare e passare il nome del file come ulteriore parametro della exec):  il file si trova usando l'indice i incrementato di 1 (cioe' per il primo processo i=0 il file e' argv[1]) */
 								close(0);
-								if (open(argv[j + 1], O_RDONLY) < 0)
-								{
+								if (open(argv[j + 1], O_RDONLY) < 0) {
 									printf("Errore nella open del file %s\n", argv[j + 1]);
 									exit(-4);
 								}
@@ -121,6 +120,44 @@
 								exit(-1);
 							}
 
+							/* ogni figlio deve chiudere il lato che non usa della pipe di comunicazione con il nipote */
+							close(p[1]);
+							/* adesso il figlio legge dalla pipe */
+							l=0;
+		       				while (read(p[0], &ch, 1)) {
+								/*printf("indice l= %d carattere letto da pipe %c\n", l, ch);*/
+								l++;
+							}
+							if (l!=0)  { /* se il figlio ha letto qualcosa */
+								lunghezza=l-1;
+							/* decrementiamo di 1 il valore di l otteniamo la lung della linea escluso il terminatore; 
+							se teniamo l avremmo lunghezza linea compreso il terminatore */ 
+							
+							/* printf("valore calcolato dal figlio %d\n", lunghezza); */
+							}
+							else {
+                                lunghezza=0;
+								/*printf("il nipote non ha passato alcuna linea di cui calcolare la lunghezza\n");*/
+                            }
+
+							/* il figlio comunica al padre */
+							write(piped[j][1], &lunghezza, sizeof(lunghezza));
+
+							/* il figlio deve aspettare il nipote per restituire il valore al padre */
+							/* se il nipote e' terminato in modo anomalo decidiamo di tornare -1 che verra' interpretato come 255 e quindi segnalando questo problema al padre */
+							ritorno=-1;
+							pid = wait(&status);
+							if (pid < 0) {	
+								printf("Errore in wait\n");
+								exit(-5);
+							}
+							if ((status & 0xFF) != 0)
+								printf("Nipote con pid %d terminato in modo anomalo\n", pid);
+							else{
+								printf("Il nipote con pid=%d ha ritornato %d\n", pid, ritorno=(int)((status >> 8) & 0xFF));
+								exit(ritorno);
+							}	
+
 /* caso y: comunicazione circolare (pipeline)
 	ogni figlio passa al successivo e l'ultimo passa al padre*/
 
@@ -135,6 +172,11 @@
 								if (i == 0 || k != i - 1)
 									close(piped[k][0]);
 							}
+
+							/* programma */
+
+							// scrivo sul figlio (o padre) successivo
+							write(piped[i][1], &s, sizeof(s_occ));
 					
 					/*padre*/
 
@@ -147,6 +189,8 @@
 									close(piped[k][0]);
 								}
 							}
+
+							read(piped[N-1][0], &, sizeof());
 
 /* caso x1: comunicazione a ring
 	innesco del padre ma poi il padre non c'entra più */
