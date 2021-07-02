@@ -2,6 +2,12 @@
 
 *in aggiornamento continuo, man mano che svolgo i vecchi esami*  
 
+
+20160608
+
+> **padre-figlio e figlio-padre** ogni figlio manda la lunghezza della riga, il padre manda una posizione casuale fra tutte le lunghezze delle righe, se esiste per il singolo figlio stampo su un file creato
+
+
 20160713
 
 > **padre-figlio e figlio-padre** dopo che il padre dice a ogni figlio un divisore, mandiamo da ogni figlio i caratteri multipli
@@ -9,6 +15,11 @@
 20160909
 
 > **pipeline** si trasmette un vettore contenente il numero di occorrente del carattere assegnato ad ogni figlio. il padre infine riordina con il *bubblesort* il vettore e stampa tutto [non commentato bene, manca qualche controllo] 
+
+20170526
+
+> **pipeline:** ogni figlio è associato ad un file, e ci si passa una struct con il numero massimo e la somma di delle occorrenze di un carattere.
+
 
 20170614
 
@@ -81,4 +92,8 @@
 
 20210121
 
-> **schema ring** il padre serve solo da innesco. i figli leggono un carattere ad ogni giro 
+> **schema ring** il padre serve solo da innesco. i figli leggono un carattere ad ogni giro. *mancano dei controlli, vedi esame seguente*
+
+20210121
+
+> **schema ring** il padre serve solo da innesco. i figli stampano le righe del loro file. *Controlli fatti bene*
