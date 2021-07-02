@@ -283,3 +283,35 @@
 								}
 
 								close(piped[0][1]);							// posso chiudere la pipe iniziale di scrittura
+
+
+
+
+/* SEGNALI */
+					void salta(){
+						token = 0;
+					}
+
+					void scrivi(){
+						token = 1;
+					}
+
+
+					/* NEL MAIN */
+						signal(SIGUSR1,scrivi);
+						signal(SIGUSR2,salta);
+
+
+						/* NEL FIGLIO */
+						pause();
+
+						if(token){
+							printf("Riga: %s\n\n", riga);
+						}
+
+
+						/* PADRE */
+						if (i == s.indice)			
+							kill(pid[i], SIGUSR1);
+						else
+							kill(pid[i], SIGUSR2);
