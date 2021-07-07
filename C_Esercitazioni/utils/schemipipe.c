@@ -288,6 +288,8 @@
 
 
 /* SEGNALI */
+					int token;
+
 					void salta(){
 						token = 0;
 					}
