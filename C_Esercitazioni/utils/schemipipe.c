@@ -3,17 +3,15 @@
 
 						/*CHIUSURA PIPE:*/
 						/* figlio */
-							for (k = 0; k < N; k++)
-							{
-								close(p[k][0]);
+							for (k = 0; k < N; k++)	{
+								close(piped[k][0]);
 								if (k != i)
-									close(p[k][1]);
+									close(piped[k][1]);
 							}
 						
 						/*padre*/	
-							for (k = 0; k < N; k++)
-							{
-								close(p[k][1]);
+							for (k = 0; k < N; k++)	{
+								close(piped[k][1]);
 							}
 
 /* caso 2: padre con N figli (comunicazione bilaterale)
@@ -79,25 +77,23 @@
 				/* codice nipote, che deve eseguire un comando shell*/
 					
 							/* prima creiamo la pipe "p" di comunicazione fra nipote e figlio */
-							if (pipe(p) < 0)
-							{
+							if (pipe(p) < 0){
 								printf("Errore nella creazione della pipe fra figlio e nipote!\n");
 								exit(-2);
 							}
 					
-							if ((pid = fork()) < 0)
-							{
+							if ((pid = fork()) < 0)	{
 								printf("Errore nella fork di creazione del nipote\n");
 								exit(-3);
 							}
-							if (pid == 0)
-							{
+							if (pid == 0)	{
 								/* codice del nipote */
 								printf("Sono il processo nipote del figlio di indice %d e pid %d e sto per recuperare l'ultima linea del file %s\n", j, getpid(), argv[j + 1]);
 								/* chiusura della pipe rimasta aperta di comunicazione fra figlio-padre che il nipote non usa */
 								close(piped[j][1]);
 								/* Ridirezione dello standard input (si poteva anche non fare e passare il nome del file come ulteriore parametro della exec):  il file si trova usando l'indice i incrementato di 1 (cioe' per il primo processo i=0 il file e' argv[1]) */
 								close(0);
+
 								if (open(argv[j + 1], O_RDONLY) < 0) {
 									printf("Errore nella open del file %s\n", argv[j + 1]);
 									exit(-4);
@@ -141,7 +137,7 @@
                             }
 
 							/* il figlio comunica al padre */
-							write(piped[j][1], &lunghezza, sizeof(lunghezza));
+							write(piped[i][1], &lunghezza, sizeof(lunghezza));
 
 							/* il figlio deve aspettare il nipote per restituire il valore al padre */
 							/* se il nipote e' terminato in modo anomalo decidiamo di tornare -1 che verra' interpretato come 255 e quindi segnalando questo problema al padre */
