@@ -19,44 +19,40 @@
 
 							
 							/* allocazione pipe figli-padre */
-							if ((pipeFiglioPadre = (pipe_t *)malloc(N * sizeof(pipe_t))) == NULL)
-							{
+							if ((pipeFiglioPadre = (pipe_t *)malloc(N * sizeof(pipe_t))) == NULL){
 								printf("Errore allocazione pipe padre\n");
 								exit(3);
 							}
 
 							/* allocazione pipe padre-figli */
-							if ((pipePadreFiglio = (pipe_t *)malloc(N * sizeof(pipe_t))) == NULL)
-							{
+							if ((pipePadreFiglio = (pipe_t *)malloc(N * sizeof(pipe_t))) == NULL)	{
 								printf("Errore allocazione pipe padre\n");
 								exit(4);
 							}
 
 							/* creazione pipe */
-							for (i = 0; i < N; i++)
-								if (pipe(pipeFiglioPadre[i]) < 0)
-								{
+							for (i = 0; i < N; i++){
+								if (pipe(pipeFiglioPadre[i]) < 0) {
 									printf("Errore creazione pipe\n");
 									exit(5);
 								}
+							}
 
 							/* creazione di altre N pipe di comunicazione/sincronizzazione con il padre */
-							for (i = 0; i < N; i++)
-								if (pipe(pipePadreFiglio[i]) < 0)
-								{
+							for (i = 0; i < N; i++){
+								if (pipe(pipePadreFiglio[i]) < 0){
 									printf("Errore creazione pipe\n");
 									exit(6);
 								}
+							}
 
 				/*figlio*/
 
 							/* chiusura pipes inutilizzate */
-							for (j = 0; j < N; j++)
-							{
+							for (j = 0; j < N; j++)	{
 								close(pipeFiglioPadre[j][0]);
 								close(pipePadreFiglio[j][1]);
-								if (j != i)
-								{
+								if (j != i)	{
 									close(pipeFiglioPadre[j][1]);
 									close(pipePadreFiglio[j][0]);
 								}
@@ -65,8 +61,7 @@
 				/* padre */
 
 							/* chiusura pipe */
-							for (i = 0; i < N; i++)
-							{
+							for (i = 0; i < N; i++)	{
 								close(pipePadreFiglio[i][0]);
 								close(pipeFiglioPadre[i][1]);
 							}
@@ -88,14 +83,15 @@
 							}
 							if (pid == 0)	{
 								/* codice del nipote */
-								printf("Sono il processo nipote del figlio di indice %d e pid %d e sto per recuperare l'ultima linea del file %s\n", j, getpid(), argv[j + 1]);
+								printf("Sono il processo nipote del figlio di indice %d e pid %d e sto per recuperare l'ultima linea del file %s\n", i, getpid(), argv[i + 1]);
 								/* chiusura della pipe rimasta aperta di comunicazione fra figlio-padre che il nipote non usa */
-								close(piped[j][1]);
-								/* Ridirezione dello standard input (si poteva anche non fare e passare il nome del file come ulteriore parametro della exec):  il file si trova usando l'indice i incrementato di 1 (cioe' per il primo processo i=0 il file e' argv[1]) */
+								close(piped[i][1]);
+
+								/* PRIMA DELL'APERTURA DEL FILE (NON SPOSTARE): Ridirezione dello standard input (si poteva anche non fare e passare il nome del file come ulteriore parametro della exec):  il file si trova usando l'indice i incrementato di 1 (cioe' per il primo processo i=0 il file e' argv[1]) */
 								close(0);
 
-								if (open(argv[j + 1], O_RDONLY) < 0) {
-									printf("Errore nella open del file %s\n", argv[j + 1]);
+								if (open(argv[i + 1], O_RDONLY) < 0) {
+									printf("Errore nella open del file %s\n", argv[i+ 1]);
 									exit(-4);
 								}
 								/* ogni nipote deve simulare il piping dei comandi nei confronti del figlio e quindi deve chiudere lo standard output e quindi usare la dup sul lato di scrittura della propria pipe */
@@ -161,8 +157,7 @@
 					/*figlio*/
 
 							//schema pipeline: ogni figlio legge dalla pipe i-1 e scrive sulla i
-							for (k = 0; k < N; k++)
-							{
+							for (k = 0; k < N; k++)	{
 								if (k != i)
 									close(piped[k][1]);
 								if (i == 0 || k != i - 1)
@@ -177,11 +172,9 @@
 					/*padre*/
 
 							/* chiude tutte le pipe che non usa */
-							for (k = 0; k < N; k++)
-							{
+							for (k = 0; k < N; k++)	{
 								close(piped[k][1]);
-								if (k != N - 1)
-								{
+								if (k != N - 1)	{
 									close(piped[k][0]);
 								}
 							}
