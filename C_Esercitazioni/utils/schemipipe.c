@@ -306,3 +306,11 @@
 							kill(pid[i], SIGUSR1);
 						else
 							kill(pid[i], SIGUSR2);
+
+// controlli lettura/ scrittura:
+
+				nr = read(pipes[n][0],tutteLinee,N*sizeof(lin));
+					if(nr != N*sizeof(lin)){
+						printf("Errore lettuar per figlio %d\n",n);
+						exit(-1);
+					}
